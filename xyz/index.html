@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoGuard: Neighborhood Pesticide Database</title>
+    <style>
+        /* CSS styles */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #27ae60;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+            --card-background: #fff;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 5px;
+            transition: background-color var(--transition-speed);
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-container {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: var(--card-shadow);
+            transition: box-shadow var(--transition-speed);
+        }
+
+        #search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--secondary-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+        }
+
+        .pesticide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .pesticide-card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pesticide-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: var(--secondary-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition-speed);
+        }
+
+        .pesticide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .pesticide-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .pesticide-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .pesticide-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .benefits, .harmful-impacts {
+            margin-top: 1rem;
+        }
+
+        .benefits h3, .harmful-impacts h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .benefits h3::before, .harmful-impacts h3::before {
+            content: "✔️";
+            margin-right: 0.5rem;
+        }
+
+        .harmful-impacts h3::before {
+            content: "⚠️";
+        }
+
+        .benefits ul, .harmful-impacts ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .benefits li, .harmful-impacts li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: #fff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: border-color var(--transition-speed);
+        }
+
+        .tab.active {
+            border-color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: color var(--transition-speed);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .social-icons {
+            font-size: 1.5rem;
+        }
+
+        .social-icons a {
+            color: #fff;
+            margin: 0 0.5rem;
+            transition: color var(--transition-speed);
+        }
+
+        .social-icons a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .pesticide-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes slideInFromLeft {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .slide-in-left {
+            animation: slideInFromLeft 0.5s ease-out;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="fade-in">EcoGuard: Neighborhood Pesticide Database</h1>
+            <p class="subtitle fade-in">Understanding the Impact of Pesticides in Our Community</p>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#pesticides">Pesticides</a>
+                <a href="#resources">Resources</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="about" class="fade-in">
+            <h2>About EcoGuard</h2>
+            <p>EcoGuard is dedicated to providing accurate and up-to-date information about pesticides commonly used in our neighborhood. Our goal is to empower community members with knowledge about the benefits and potential harmful impacts of these substances, promoting informed decision-making and environmental stewardship.</p>
+        </section>
+
+        <section id="pesticides">
+            <h2>Pesticide Database</h2>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for a pesticide...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="pesticide-grid" id="pesticide-grid"></div>
+        </section>
+
+        <section id="resources" class="fade-in">
+            <h2>Additional Resources</h2>
+            <ul>
+                <li><a href="#">Safe Pesticide Application Guidelines</a></li>
+                <li><a href="#">Organic Farming Techniques</a></li>
+                <li><a href="#">Local Environmental Regulations</a></li>
+                <li><a href="#">Pesticide Alternatives for Home Gardening</a></li>
+            </ul>
+        </section>
+
+        <section id="contact" class="fade-in">
+            <h2>Contact Us</h2>
+            <p>Have questions or suggestions? Reach out to us at <a href="mailto:info@ecoguard.com">info@ecoguard.com</a></p>
+        </section>
+    </main>
+
+    <div id="pesticideModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div class="tabs">
+                <div class="tab active" data-tab="overview">Overview</div>
+                <div class="tab" data-tab="benefits">Benefits</div>
+                <div class="tab" data-tab="impacts">Harmful Impacts</div>
+            </div>
+            <div id="modalOverview" class="tab-content active"></div>
+            <div id="modalBenefits" class="tab-content"></div>
+            <div id="modalImpacts" class="tab-content"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2023 EcoGuard: Neighborhood Pesticide Database. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#about">About</a>
+                    <a href="#pesticides">Pesticides</a>
+                    <a href="#resources">Resources</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="social-icons">
+                    <a href="#" title="Facebook">📘</a>
+                    <a href="#" title="Twitter">🐦</a>
+                    <a href="#" title="Instagram">📷</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Pesticide database
+        const pesticides = [
+            {
+                name: "Glyphosate",
+                icon: "🌿",
+                overview: "Glyphosate is a broad-spectrum systemic herbicide used to kill weeds, especially annual broadleaf weeds and grasses that compete with crops.",
+                benefits: [
+                    "Effective against a wide range of weeds",
+                    "Helps in no-till farming, reducing soil erosion",
+                    "Relatively low toxicity to animals and humans when used correctly",
+                    "Increases crop yields by reducing weed competition"
+                ],
+                harmfulImpacts: [
+                    "Potential carcinogen (debated)",
+                    "Can harm beneficial insects like bees",
+                    "May lead to herbicide-resistant weeds",
+                    "Potential negative impact on soil microorganisms"
+                ],
+                
+                tags: ["Herbicide", "Crop Protection", "Controversial"]
+            },
+            {
+                name: "Chlorpyrifos",
+                icon: "🐛",
+                overview: "Chlorpyrifos is an organophosphate insecticide used to control foliage and soil-borne insect pests on a variety of food and feed crops.",
+                benefits: [
+                    "Effective against a wide range of insects",
+                    "Long-lasting effect, reducing the frequency of application",
+                    "Helps protect crops from damage, increasing yield",
+                    "Relatively inexpensive compared to some alternatives"
+                ],
+                harmfulImpacts: [
+                    "Toxic to birds, fish, and beneficial insects",
+                    "Can cause developmental problems in children",
+                    "Persists in the environment, potentially contaminating water sources",
+                    "Potential neurotoxic effects on humans and animals"
+                ],
+                tags: ["Insecticide", "Neurotoxin", "Environmental Concern"]
+            },
+            {
+                name: "Atrazine",
+                icon: "🌾",
+                overview: "Atrazine is a widely used herbicide that prevents pre- and post-emergence broadleaf and grassy weeds in major crops.",
+                benefits: [
+                    "Effective pre and post-emergence herbicide",
+                    "Increases crop yields, especially in corn",
+                    "Cost-effective weed control",
+                    "Reduces soil erosion by promoting conservation tillage"
+                ],
+                harmfulImpacts: [
+                    "Potential endocrine disruptor",
+                    "Contaminates groundwater and surface water",
+                    "Harmful to aquatic life and amphibians",
+                    "Persists in the environment for long periods"
+                ],
+                tags: ["Herbicide", "Water Contamination", "Endocrine Disruptor"]
+            },
+            {
+                name: "Neonicotinoids",
+                icon: "🐝",
+                overview: "Neonicotinoids are a class of neuro-active insecticides chemically similar to nicotine, primarily used for pest control in agriculture.",
+                benefits: [
+                    "Systemic insecticide, protecting the entire plant",
+                    "Less toxic to mammals and birds compared to older insecticides",
+                    "Can be applied as a seed treatment, reducing spray applications",
+                    "Effective against a wide range of sucking and chewing insects"
+                ],
+                harmfulImpacts: [
+                    "Highly toxic to bees and other pollinators",
+                    "Persistent in the environment",
+                    "Can accumulate in soil and water, affecting non-target organisms",
+                    "Potential negative impact on bird populations"
+                ],
+                tags: ["Insecticide", "Bee Decline", "Systemic"]
+            },
+            {
+                name: "2,4-Dichlorophenoxyacetic acid (2,4-D)",
+                icon: "🍃",
+                overview: "2,4-D is one of the oldest and most widely used herbicides for controlling broadleaf weeds in agriculture and non-agricultural settings.",
+                benefits: [
+                    "Effective against broadleaf weeds",
+                    "Relatively inexpensive",
+                    "Quickly degraded in soil",
+                    "Selective herbicide, generally not harming grasses"
+                ],
+                harmfulImpacts: [
+                    "Can drift and damage nearby crops",
+                    "Potential hormone disruptor",
+                    "Toxic to aquatic organisms",
+                    "Possible link to certain types of cancer (debated)"
+                ],
+                tags: ["Herbicide", "Hormone Disruptor", "Drift Concern"]
+            },
+            {
+                name: "Malathion",
+                icon: "🦟",
+                overview: "Malathion is an organophosphate insecticide commonly used to control mosquitoes and a variety of insects that attack fruits, vegetables, landscaping plants, and shrubs.",
+                benefits: [
+                    "Broad-spectrum insecticide effective against many pests",
+                    "Relatively low toxicity to mammals when used as directed",
+                    "Breaks down quickly in the environment",
+                    "Useful in public health mosquito control programs"
+                ],
+                harmfulImpacts: [
+                    "Toxic to bees and other beneficial insects",
+                    "Can be toxic to fish and aquatic invertebrates",
+                    "Potential cholinesterase inhibitor in humans",
+                    "May contribute to insecticide resistance in target pests"
+                ],
+                tags: ["Insecticide", "Mosquito Control", "Organophosphate"]
+            },
+            {
+                name: "Dicamba",
+                icon: "🌱",
+                overview: "Dicamba is a selective herbicide used in agriculture for broadleaf weed control, particularly in corn, soybean, and cotton crops.",
+                benefits: [
+                    "Effective against herbicide-resistant weeds",
+                    "Can be used in combination with other herbicides",
+                    "Provides residual weed control",
+                    "Helps manage weeds in genetically modified crops"
+                ],
+                harmfulImpacts: [
+                    "Prone to drift, potentially damaging neighboring crops",
+                    "Can contaminate water sources",
+                    "May harm non-target plants and trees",
+                    "Potential for development of herbicide-resistant weeds"
+                ],
+                tags: ["Herbicide", "Drift Concern", "GMO Crops"]
+            },
+            {
+                name: "Copper Sulfate",
+                icon: "🍇",
+                overview: "Copper sulfate is a inorganic compound used as a fungicide, bactericide, and algaecide in agriculture and water treatment.",
+                benefits: [
+                    "Effective against a wide range of fungal and bacterial diseases",
+                    "Used in organic farming as a fungicide",
+                    "Controls algae in water bodies",
+                    "Long history of use and well-understood effects"
+                ],
+                harmfulImpacts: [
+                    "Can accumulate in soil with repeated use",
+                    "Toxic to fish and aquatic invertebrates",
+                    "May harm beneficial soil microorganisms",
+                    "Can cause phytotoxicity in some plants if overused"
+                ],
+                tags: ["Fungicide", "Algaecide", "Organic Farming"]
+            },
+            {
+                name: "Imidacloprid",
+                icon: "🐜",
+                overview: "Imidacloprid is a systemic insecticide that acts as an insect neurotoxin and belongs to a class of chemicals called neonicotinoids.",
+                benefits: [
+                    "Effective against sucking insects like aphids and whiteflies",
+                    "Can be applied as a soil treatment, reducing foliar applications",
+                    "Long-lasting protection for crops",
+                    "Relatively low toxicity to mammals"
+                ],
+                harmfulImpacts: [
+                    "Highly toxic to bees and other pollinators",
+                    "Persistent in the environment",
+                    "Can leach into groundwater",
+                    "Potential negative impacts on bird populations"
+                ],
+                tags: ["Insecticide", "Neonicotinoid", "Bee Toxicity"]
+            },
+            {
+                name: "Pendimethalin",
+                icon: "🌾",
+                overview: "Pendimethalin is a selective herbicide used to control annual grasses and certain broadleaf weeds in crops and turf grass.",
+                benefits: [
+                    "Provides pre-emergence and early post-emergence weed control",
+                    "Effective in a variety of crops including corn, soybeans, and cotton",
+                    "Low risk of leaching into groundwater",
+                    "Can be used in reduced tillage systems"
+                ],
+                harmfulImpacts: [
+                    "Moderately persistent in soil",
+                    "Toxic to fish and aquatic invertebrates",
+                    "Can inhibit root growth in non-target plants",
+                    "Potential for crop injury if not applied correctly"
+                ],
+                tags: ["Herbicide", "Pre-emergence", "Soil Active"]
+            }
+        ];
+
+        // Function to create pesticide cards
+        function createPesticideCard(pesticide) {
+            const card = document.createElement('div');
+            card.className = 'pesticide-card slide-in-left';
+            card.innerHTML = `
+                <div class="pesticide-icon">${pesticide.icon}</div>
+                <h2>${pesticide.name}</h2>
+                <p>${pesticide.overview.substring(0, 100)}...</p>
+                <div class="tags">
+                    ${pesticide.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                <button class="read-more" data-pesticide="${pesticide.name}">Read More</button>
+            `;
+            return card;
+        }
+
+        // Function to display pesticides
+        function displayPesticides(pesticides) {
+            const grid = document.getElementById('pesticide-grid');
+            grid.innerHTML = '';
+            pesticides.forEach(pesticide => {
+                grid.appendChild(createPesticideCard(pesticide));
+            });
+        }
+
+        // Initial display
+        displayPesticides(pesticides);
+
+        // Search functionality
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredPesticides = pesticides.filter(pesticide => 
+                pesticide.name.toLowerCase().includes(searchTerm) ||
+                pesticide.overview.toLowerCase().includes(searchTerm) ||
+                pesticide.benefits.some(benefit => benefit.toLowerCase().includes(searchTerm)) ||
+                pesticide.harmfulImpacts.some(impact => impact.toLowerCase().includes(searchTerm)) ||
+                pesticide.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+            );
+            displayPesticides(filteredPesticides);
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('pesticideModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalOverview = document.getElementById('modalOverview');
+        const modalBenefits = document.getElementById('modalBenefits');
+        const modalImpacts = document.getElementById('modalImpacts');
+        const closeBtn = document.getElementsByClassName('close')[0];
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.className === 'read-more') {
+                const pesticideName = e.target.getAttribute('data-pesticide');
+                const pesticide = pesticides.find(p => p.name === pesticideName);
+                
+                modalTitle.textContent = pesticide.name;
+                modalOverview.innerHTML = `<p>${pesticide.overview}</p>`;
+                modalBenefits.innerHTML = `
+                    <ul>
+                        ${pesticide.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                    </ul>
+                `;
+                modalImpacts.innerHTML = `
+                    <ul>
+                        ${pesticide.harmfulImpacts.map(impact => `<li>${impact}</li>`).join('')}
+                    </ul>
+                `;
+                
+                modal.style.display = 'block';
+            }
+        });
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`modal${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for fade-in effect
+        const fadeElems = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElems.forEach(elem => {
+            elem.style.opacity = 0;
+            elem.style.transition = 'opacity 0.5s ease-out';
+            observer.observe(elem);
+        });
+    </script>
+</body>
+</html>
